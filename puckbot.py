@@ -67,9 +67,6 @@ class HockeyBot(discord.Client):
 					else:
 						await message.channel.send('Sorry I don\'t understand, try saying \'Puckbot HELP\' for a list of available commands.')	
 
-				else:
-					await message.channel.send('Sorry I don\'t understand, try saying \'Puckbot HELP\' for a list of available commands.')
-
 def ReadTokenFile(filename):
 	#Read the token from a file
 	try:
