@@ -55,17 +55,53 @@ class HockeyBot(discord.Client):
 						
 					elif 'SCORES' in messageArray[1].upper():	
 						#?expand=schedule.linescore
-						scoreEmbed = discord.Embed()
-						scoreEmbed.title = 'Brrr its getting cold in here...'
-						scoreEmbed.type = 'rich'
-						scoreEmbed.color = discord.Color.dark_blue()
 						
-						#Get the NHL schedule
+						
+						#Get the NHL schedule with linescore
 						linescoreResponse = await self.commonFunctions.sendGetRequest('https://statsapi.web.nhl.com/api/v1/schedule?expand=schedule.linescore')
 						
 						#Parse the JSON
-						linescore = json.loads(linescoreResponse.text)
-						print(linescore)
+						linescoreJson = json.loads(linescoreResponse.text)
+						
+						
+						allGames = games = linescoreJson['dates'][0]['games']
+						
+						scheduledGames = []
+						liveGames = []
+						finalGames = []
+						
+						for games in allGames:
+							#print('DEBUG: [\'status\'][\'detailedState\'] = %s' % games['status']['detailedState'])
+							print('DEBUG: Game Status = %s' % games['status'])
+							
+							scoreEmbed = discord.Embed()
+							scoreEmbed.title = 'gamePk ' + str(games['gamePk'])
+							scoreEmbed.type = 'rich'
+							scoreEmbed.color = discord.Color.dark_blue()
+							
+							scoreEmbed.add_field(name='gameDate', value=str(games['gameDate']), inline=False)
+							scoreEmbed.add_field(name='teams', value=games['teams']['away']['team']['name'] + ' vs ' + games['teams']['home']['team']['name'], inline=False)
+							scoreEmbed.add_field(name='homeScore', value=str(games['teams']['home']['score']), inline=False)
+							scoreEmbed.add_field(name='awayScore', value=str(games['teams']['away']['score']), inline=False)
+							scoreEmbed.add_field(name='currentPeriod', value=str(games['linescore']['currentPeriod']), inline=False)
+							scoreEmbed.add_field(name='homeGoals', value=str(games['linescore']['teams']['home']['goals']), inline=False)
+							scoreEmbed.add_field(name='homeShotsOnGoal', value=str(games['linescore']['teams']['home']['shotsOnGoal']), inline=False)
+							scoreEmbed.add_field(name='homePowerPlay', value=str(games['linescore']['teams']['home']['powerPlay']), inline=False)
+							scoreEmbed.add_field(name='awayGoals', value=str(games['linescore']['teams']['away']['goals']), inline=False)
+							scoreEmbed.add_field(name='awayShotsOnGoal', value=str(games['linescore']['teams']['away']['shotsOnGoal']), inline=False)
+							scoreEmbed.add_field(name='awayPowerPlay', value=str(games['linescore']['teams']['away']['powerPlay']), inline=False)
+							scoreEmbed.add_field(name='hasShootout', value=str(games['linescore']['hasShootout']), inline=False)
+							scoreEmbed.add_field(name='inIntermission', value=str(games['linescore']['intermissionInfo']['inIntermission']), inline=False)
+							
+							await message.channel.send(embed=scoreEmbed)
+							#if games['status']['detailedState'] == 'Scheduled':
+							#	scheduledGames.append(games)
+							#All states are unknown at the moment
+							#else
+								#print('DEBUG: [\'status\'][\'detailedState\'] = %s' % games['status']['detailedState'])
+								
+						
+						
 					
 					#Display the help message
 					elif 'HELP' in messageArray[1].upper():
