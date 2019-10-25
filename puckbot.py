@@ -53,6 +53,19 @@ class HockeyBot(discord.Client):
 						contentString = 'Puckbot hipchecked ' + message.author.mention + ' into the boards! Savage! \n Anyway here are the games for ' + gameTimeLocal.strftime('%m/%d/%Y')
 						await message.channel.send(content=contentString, embed=hockeyEmbed)
 						
+					elif 'SCORES' in messageArray[1].upper():	
+						#?expand=schedule.linescore
+						scoreEmbed = discord.Embed()
+						scoreEmbed.title = 'Brrr its getting cold in here...'
+						scoreEmbed.type = 'rich'
+						scoreEmbed.color = discord.Color.dark_blue()
+						
+						#Get the NHL schedule
+						linescoreResponse = await self.commonFunctions.sendGetRequest('https://statsapi.web.nhl.com/api/v1/schedule?expand=schedule.linescore')
+						
+						#Parse the JSON
+						linescore = json.loads(linescoreResponse.text)
+						print(linescore)
 					
 					#Display the help message
 					elif 'HELP' in messageArray[1].upper():
