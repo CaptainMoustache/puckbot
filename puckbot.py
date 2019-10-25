@@ -27,7 +27,7 @@ class HockeyBot(discord.Client):
 			messageArray = message.content.split()
 			if len(messageArray) > 0:
 				#Bot was called with enough arguments
-				if 'PUCKBOT' in messageArray[0].upper() and len(messageArray) > 1:
+				if ('PUCKBOT' in messageArray[0].upper() and len(messageArray) > 1) or (self.user.mention in messageArray[0].upper():
 					if 'SCHEDULE' in messageArray[1].upper():
 						hockeyEmbed = discord.Embed()
 						hockeyEmbed.title = 'Brrr its getting cold in here...'
