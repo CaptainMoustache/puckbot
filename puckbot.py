@@ -66,11 +66,67 @@ class HockeyBot(discord.Client):
 						
 						allGames = games = linescoreJson['dates'][0]['games']
 						
-						scheduledGames = []
-						liveGames = []
-						finalGames = []
+						scheduledGamesList = []
+						liveGamesList = []
+						finalGamesList = []
 						
+                        
+                        #Loop through all games and append them the appropriate list
 						for games in allGames:
+                        
+                            if games['status']['detailedState'] == 'Scheduled':
+                                scheduledGamesList.append(games)
+                            elif games['status']['detailedState'] == 'Live':
+                                liveGamesList.append(games)
+                            elif games['status']['detailedState'] == 'Final':
+                                finalGamesList.append(games)
+                        
+                        if len(scheduledGamesList) > 0:
+                            #Create an embed object for each scheduled game
+                            scheduledScoreEmbed = discord.Embed()
+                            scheduledScoreEmbed.title = "Scheduled Games"
+                            scheduledScoreEmbed.type = 'rich'
+                            scheduledScoreEmbed.color = discord.Color.dark_blue()
+                            
+                            for scheduledGames in scheduledGamesList:
+                                #Get the scheduled time
+                                gameTimeLocal = self.commonFunctions.get_Local_Time(games['gameDate'])
+                                nameString = games['teams']['away']['team']['name'] + ' vs ' + games['teams']['home']['team']['name']
+                                gameTimeString = gameTimeLocal.strftime('%-I:%M%p') + ' EST' + ' @ ' + games['venue']['name']
+                                scheduledScoreEmbed.add_field(name=nameString, value=gameTimeString)
+                            
+                        if len(liveGamesList) > 0:
+                            #Create an embed object for each live game
+                            liveScoreEmbed = discord.Embed()
+                            liveScoreEmbed.title = "Live Games"
+                            liveScoreEmbed.type = 'rich'
+                            liveScoreEmbed.color = discord.Color.dark_blue()
+                            
+                        if len(finalGamesList) > 0:
+                            #Create an embed object for each final game
+                            finalScoreEmbed = discord.Embed()
+                            finalScoreEmbed.title = "Final Games"
+                            finalScoreEmbed.type = 'rich'
+                            finalScoreEmbed.color = discord.Color.dark_blue()
+                        
+                        
+                        #If the game is scheduled
+                        if games['status']['detailedState'] == 'Scheduled':
+                            #scheduledScoreEmbed.add_field(name='Scheduled Game:', value=games['teams']['away']['team']['name'] + ' vs ' + games['teams']['home']['team']['name'], inline=False)
+                            #Get the scheduled time
+                            gameTimeLocal = self.commonFunctions.get_Local_Time(games['gameDate'])
+                            nameString = games['teams']['away']['team']['name'] + ' vs ' + games['teams']['home']['team']['name']
+                            gameTimeString = gameTimeLocal.strftime('%-I:%M%p') + ' EST' + ' @ ' + games['venue']['name']
+                            scheduledScoreEmbed.add_field(name=nameString, value=gameTimeString)
+                        
+                        await message.channel.send(embed=scheduledScoreEmbed)
+                        
+                            
+                            
+                            
+                            
+                            '''
+                            
 							#print('DEBUG: [\'status\'][\'detailedState\'] = %s' % games['status']['detailedState'])
 							print('DEBUG: Game Status = %s' % games['status'])
 							
@@ -99,7 +155,7 @@ class HockeyBot(discord.Client):
 							#All states are unknown at the moment
 							#else
 								#print('DEBUG: [\'status\'][\'detailedState\'] = %s' % games['status']['detailedState'])
-								
+							'''
 						
 						
 					
