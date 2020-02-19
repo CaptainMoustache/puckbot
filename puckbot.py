@@ -9,6 +9,7 @@ import re
 import dateutil.parser
 import requests
 import commonfunctions
+import pymongo
 
 class HockeyBot(discord.Client):
 	commonFunctions = commonfunctions.CommonFunctions()
@@ -107,8 +108,16 @@ class HockeyBot(discord.Client):
 							for liveGame in liveGamesList:
 								nameString = liveGame['teams']['away']['team']['name'] + ' vs ' + liveGame['teams']['home']['team']['name']
 								#gameTimeString = gameTimeLocal.strftime('%-I:%M%p') + ' EST' + ' @ ' + games['venue']['name']
-								scoreString = str(liveGame['teams']['away']['score']) + " - " + str(liveGame['teams']['home']['score'])
-								finalScoreEmbed.add_field(name=nameString, value=scoreString)
+								#statusString = str(liveGame['teams']['away']['score']) + " - " + str(liveGame['teams']['home']['score'])
+								#Determine if the game is in intermission
+								if liveGame['linescore']['intermissionInfo']['inIntermission'] == 'true':
+									statusString = "Intermission: T-" + str(liveGame['linescore']['intermissionInfo']['inIntermission']['intermissionTimeRemaining']) + "until next period\n"
+								else:
+									statusString = "Period: " + str(liveGame['linescore']['currentPeriod']) + "\n"
+								
+								statusString = statusString + str(liveGame['teams']['away']['score']) + " - " + str(liveGame['teams']['home']['score'])
+								
+								finalScoreEmbed.add_field(name=nameString, value=statusString)
 							
 							await message.channel.send(embed=finalScoreEmbed)
 							
