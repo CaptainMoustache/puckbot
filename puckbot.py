@@ -119,11 +119,26 @@ class HockeyBot(discord.Client):
                             gameTimeString = gameTimeLocal.strftime('%-I:%M%p') + ' EST' + ' @ ' + games['venue']['name']
                             scheduledScoreEmbed.add_field(name=nameString, value=gameTimeString)
                         
-                        await message.channel.send(embed=scheduledScoreEmbed)
+							await message.channel.send(embed=scheduledScoreEmbed)
                         
+                        
+						elif games['status']['detailedState'] == 'Final':
+							#gameTimeLocal = self.commonFunctions.get_Local_Time(games['gameDate'])
+                            nameString = games['teams']['away']['team']['name'] + ' vs ' + games['teams']['home']['team']['name']
+                            #gameTimeString = gameTimeLocal.strftime('%-I:%M%p') + ' EST' + ' @ ' + games['venue']['name']
+							scoreString = str(games['teams']['away']['score']) + " - " + str(games['teams']['home']['score'])
+                            finalScoreEmbed.add_field(name=nameString, value=scoreString)
                             
+                            await message.channel.send(embed=finalScoreEmbed)
+							
+						elif games['status']['detailedState'] == 'Live':
+							#gameTimeLocal = self.commonFunctions.get_Local_Time(games['gameDate'])
+                            nameString = games['teams']['away']['team']['name'] + ' vs ' + games['teams']['home']['team']['name']
+                            #gameTimeString = gameTimeLocal.strftime('%-I:%M%p') + ' EST' + ' @ ' + games['venue']['name']
+							scoreString = str(games['teams']['away']['score']) + " - " + str(games['teams']['home']['score'])
+                            finalScoreEmbed.add_field(name=nameString, value=scoreString)
                             
-                            
+                            await message.channel.send(embed=finalScoreEmbed)
                             
                             '''
                             
