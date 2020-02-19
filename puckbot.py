@@ -23,6 +23,9 @@ class HockeyBot(discord.Client):
 		# don't respond to ourselves
 		if message.author == self.user:
 			return
+		# don't respond to other bots
+		elif message.author.bot:
+			return
 		else:
 			#Split the message at whitespace
 			messageArray = message.content.split()
