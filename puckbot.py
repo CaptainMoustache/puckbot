@@ -64,84 +64,102 @@ class HockeyBot(discord.Client):
 						linescoreJson = json.loads(linescoreResponse.text)
 						
 						
-						allGames = games = linescoreJson['dates'][0]['games']
+						#allGames = games = linescoreJson['dates'][0]['games']
+						allGames = linescoreJson['dates'][0]['games']
 						
 						scheduledGamesList = []
 						liveGamesList = []
 						finalGamesList = []
 						
-                        
-                        #Loop through all games and append them the appropriate list
+						
+						#Loop through all games and append them the appropriate list
 						for games in allGames:
-                        
-                            if games['status']['detailedState'] == 'Scheduled':
-                                scheduledGamesList.append(games)
-                            elif games['status']['detailedState'] == 'Live':
-                                liveGamesList.append(games)
-                            elif games['status']['detailedState'] == 'Final':
-                                finalGamesList.append(games)
-                        
-                        if len(scheduledGamesList) > 0:
-                            #Create an embed object for each scheduled game
-                            scheduledScoreEmbed = discord.Embed()
-                            scheduledScoreEmbed.title = "Scheduled Games"
-                            scheduledScoreEmbed.type = 'rich'
-                            scheduledScoreEmbed.color = discord.Color.dark_blue()
-                            
-                            for scheduledGames in scheduledGamesList:
-                                #Get the scheduled time
-                                gameTimeLocal = self.commonFunctions.get_Local_Time(games['gameDate'])
-                                nameString = games['teams']['away']['team']['name'] + ' vs ' + games['teams']['home']['team']['name']
-                                gameTimeString = gameTimeLocal.strftime('%-I:%M%p') + ' EST' + ' @ ' + games['venue']['name']
-                                scheduledScoreEmbed.add_field(name=nameString, value=gameTimeString)
-                            
-                        if len(liveGamesList) > 0:
-                            #Create an embed object for each live game
-                            liveScoreEmbed = discord.Embed()
-                            liveScoreEmbed.title = "Live Games"
-                            liveScoreEmbed.type = 'rich'
-                            liveScoreEmbed.color = discord.Color.dark_blue()
-                            
-                        if len(finalGamesList) > 0:
-                            #Create an embed object for each final game
-                            finalScoreEmbed = discord.Embed()
-                            finalScoreEmbed.title = "Final Games"
-                            finalScoreEmbed.type = 'rich'
-                            finalScoreEmbed.color = discord.Color.dark_blue()
-                        
-                        
-                        #If the game is scheduled
-                        if games['status']['detailedState'] == 'Scheduled':
-                            #scheduledScoreEmbed.add_field(name='Scheduled Game:', value=games['teams']['away']['team']['name'] + ' vs ' + games['teams']['home']['team']['name'], inline=False)
-                            #Get the scheduled time
-                            gameTimeLocal = self.commonFunctions.get_Local_Time(games['gameDate'])
-                            nameString = games['teams']['away']['team']['name'] + ' vs ' + games['teams']['home']['team']['name']
-                            gameTimeString = gameTimeLocal.strftime('%-I:%M%p') + ' EST' + ' @ ' + games['venue']['name']
-                            scheduledScoreEmbed.add_field(name=nameString, value=gameTimeString)
-                        
+							if games['status']['detailedState'] == 'Scheduled':
+								scheduledGamesList.append(games)
+							elif games['status']['detailedState'] == 'Live':
+								liveGamesList.append(games)
+							elif games['status']['detailedState'] == 'Final':
+								finalGamesList.append(games)
+						
+						if len(scheduledGamesList) > 0:
+							#Create an embed object for each scheduled game
+							scheduledScoreEmbed = discord.Embed()
+							scheduledScoreEmbed.title = "Scheduled Games"
+							scheduledScoreEmbed.type = 'rich'
+							scheduledScoreEmbed.color = discord.Color.dark_blue()
+							
+							for scheduledGame in scheduledGamesList:
+								#Get the scheduled time
+								gameTimeLocal = self.commonFunctions.get_Local_Time(scheduledGame['gameDate'])
+								nameString = scheduledGame['teams']['away']['team']['name'] + ' vs ' + scheduledGame['teams']['home']['team']['name']
+								gameTimeString = gameTimeLocal.strftime('%-I:%M%p') + ' EST' + ' @ ' + scheduledGame['venue']['name']
+								scheduledScoreEmbed.add_field(name=nameString, value=gameTimeString)
+								
+							await message.channel.send(embed=scheduledScoreEmbed)	
+								
+						if len(liveGamesList) > 0:
+							#Create an embed object for each live game
+							liveScoreEmbed = discord.Embed()
+							liveScoreEmbed.title = "Live Games"
+							liveScoreEmbed.type = 'rich'
+							liveScoreEmbed.color = discord.Color.dark_blue()
+							
+							for liveGame in liveGamesList:
+								nameString = liveGame['teams']['away']['team']['name'] + ' vs ' + liveGame['teams']['home']['team']['name']
+								#gameTimeString = gameTimeLocal.strftime('%-I:%M%p') + ' EST' + ' @ ' + games['venue']['name']
+								scoreString = str(liveGame['teams']['away']['score']) + " - " + str(liveGame['teams']['home']['score'])
+								finalScoreEmbed.add_field(name=nameString, value=scoreString)
+							
+							await message.channel.send(embed=finalScoreEmbed)
+							
+						if len(finalGamesList) > 0:
+							#Create an embed object for each final game
+							finalScoreEmbed = discord.Embed()
+							finalScoreEmbed.title = "Final Games"
+							finalScoreEmbed.type = 'rich'
+							finalScoreEmbed.color = discord.Color.dark_blue()
+							
+							for finalGame in finalGamesList:
+								nameString = finalGame['teams']['away']['team']['name'] + ' vs ' + finalGame['teams']['home']['team']['name']
+								#gameTimeString = gameTimeLocal.strftime('%-I:%M%p') + ' EST' + ' @ ' + games['venue']['name']
+								scoreString = str(finalGame['teams']['away']['score']) + " - " + str(finalGame['teams']['home']['score'])
+								finalScoreEmbed.add_field(name=nameString, value=scoreString)
+							
+							await message.channel.send(embed=finalScoreEmbed)
+						
+						
+						'''
+						#If the game is scheduled
+						if games['status']['detailedState'] == 'Scheduled':
+							#scheduledScoreEmbed.add_field(name='Scheduled Game:', value=games['teams']['away']['team']['name'] + ' vs ' + games['teams']['home']['team']['name'], inline=False)
+							#Get the scheduled time
+							gameTimeLocal = self.commonFunctions.get_Local_Time(games['gameDate'])
+							nameString = games['teams']['away']['team']['name'] + ' vs ' + games['teams']['home']['team']['name']
+							gameTimeString = gameTimeLocal.strftime('%-I:%M%p') + ' EST' + ' @ ' + games['venue']['name']
+							scheduledScoreEmbed.add_field(name=nameString, value=gameTimeString)
+						
 							await message.channel.send(embed=scheduledScoreEmbed)
-                        
-                        
+						
+						
 						elif games['status']['detailedState'] == 'Final':
 							#gameTimeLocal = self.commonFunctions.get_Local_Time(games['gameDate'])
-                            nameString = games['teams']['away']['team']['name'] + ' vs ' + games['teams']['home']['team']['name']
-                            #gameTimeString = gameTimeLocal.strftime('%-I:%M%p') + ' EST' + ' @ ' + games['venue']['name']
+							nameString = games['teams']['away']['team']['name'] + ' vs ' + games['teams']['home']['team']['name']
+							#gameTimeString = gameTimeLocal.strftime('%-I:%M%p') + ' EST' + ' @ ' + games['venue']['name']
 							scoreString = str(games['teams']['away']['score']) + " - " + str(games['teams']['home']['score'])
-                            finalScoreEmbed.add_field(name=nameString, value=scoreString)
-                            
-                            await message.channel.send(embed=finalScoreEmbed)
+							finalScoreEmbed.add_field(name=nameString, value=scoreString)
+							
+							await message.channel.send(embed=finalScoreEmbed)
 							
 						elif games['status']['detailedState'] == 'Live':
 							#gameTimeLocal = self.commonFunctions.get_Local_Time(games['gameDate'])
-                            nameString = games['teams']['away']['team']['name'] + ' vs ' + games['teams']['home']['team']['name']
-                            #gameTimeString = gameTimeLocal.strftime('%-I:%M%p') + ' EST' + ' @ ' + games['venue']['name']
+							nameString = games['teams']['away']['team']['name'] + ' vs ' + games['teams']['home']['team']['name']
+							#gameTimeString = gameTimeLocal.strftime('%-I:%M%p') + ' EST' + ' @ ' + games['venue']['name']
 							scoreString = str(games['teams']['away']['score']) + " - " + str(games['teams']['home']['score'])
-                            finalScoreEmbed.add_field(name=nameString, value=scoreString)
-                            
-                            await message.channel.send(embed=finalScoreEmbed)
-                            
-                            '''
-                            
+							finalScoreEmbed.add_field(name=nameString, value=scoreString)
+							
+							await message.channel.send(embed=finalScoreEmbed)
+							
+							
 							#print('DEBUG: [\'status\'][\'detailedState\'] = %s' % games['status']['detailedState'])
 							print('DEBUG: Game Status = %s' % games['status'])
 							
